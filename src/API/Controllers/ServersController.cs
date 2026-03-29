@@ -1,6 +1,5 @@
 using API.Extensions;
-using Application.Contracts;
-using Application.Dto;
+using Application.Contracts.Servers;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +18,9 @@ public class ServersController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> AddServer(ServerDto server)
+	public async Task<ActionResult<AddServerResponse>> AddServer(AddServerRequest addServerRequest)
 	{
-		var result = await _serversService.Add(server);
+		var result = await _serversService.Add(addServerRequest);
 		return result.ToActionResult();
 	}
 

@@ -1,4 +1,4 @@
-using Application.Contracts;
+using Application.Contracts.Servers;
 using Domain.Entities;
 
 namespace Application.Interfaces.Repositories;

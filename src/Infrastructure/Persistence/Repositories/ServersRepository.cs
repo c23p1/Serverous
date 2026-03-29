@@ -1,4 +1,4 @@
-using Application.Contracts;
+using Application.Contracts.Servers;
 using Application.Interfaces.Repositories;
 using Domain.Entities;
 using Infrastructure.Persistence.Data;

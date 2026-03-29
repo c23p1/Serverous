@@ -2,7 +2,7 @@ namespace Domain.Enums;
 
 public enum ServerStatus
 {
-	Stopped,
-	Starting,
-	Started
+	Stopped = 0,
+	Starting = 1,
+	Started = 2
 }
