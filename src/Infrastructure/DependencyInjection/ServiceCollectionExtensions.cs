@@ -1,4 +1,9 @@
+using Application.Interfaces;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
+using Application.Services;
 using Infrastructure.Persistence.Data;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +26,11 @@ public static class ServiceCollectionExtensions
 			var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 			dbContext.Database.EnsureCreated();
 		}
+
+		services.AddScoped<IServersRepository, ServersRepository>();
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+		services.AddTransient<IServersService, ServersService>();
 
 		return services;
 	}
