@@ -18,7 +18,10 @@ public class ServersRepository : IServersRepository
 	public async Task<List<Server>> GetAvailableAsync(ServerFilters filters)
 	{
 		var servers = _servers.Where(s => !s.Sessions.Any(session => session.IsActive));
-		servers = servers.Where(s => s.OperatingSystem == filters.OperatingSystem);
+		if (filters.OperatingSystem is not null)
+		{
+			servers = servers.Where(s => s.OperatingSystem == filters.OperatingSystem);
+		}
 		servers = servers.Where(s => s.RamGiB >= filters.MinRamGiB && s.RamGiB <= filters.MaxRamGiB);
 		servers = servers.Where(s => s.StorageGiB >= filters.MinStorageGiB && s.StorageGiB <= filters.MaxStorageGiB);
 		servers = servers.Where(s => s.CpuCoreCount >= filters.MinCpuCoreCount && s.CpuCoreCount <= filters.MaxCpuCoreCount);
