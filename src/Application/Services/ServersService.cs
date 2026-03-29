@@ -45,30 +45,4 @@ public class ServersService : IServersService
 		};
 		return GenericResult<AddServerResponse>.Success(addServerResponse);
 	}
-
-	public async Task<Result> StartServerById(Guid serverId)
-	{
-		var server = await _serversRepository.GetByIdAsync(serverId);
-		if (server is null)
-		{
-			return Result.Failure(Error.EntityNotFound(nameof(Server), serverId.ToString()));
-		}
-		server.Status = ServerStatus.Starting;
-		_serversRepository.Update(server);
-		await _unitOfWork.SaveChangesAsync();
-		return Result.Success();
-	}
-
-	public async Task<Result> StopServerById(Guid serverId)
-	{
-		var server = await _serversRepository.GetByIdAsync(serverId);
-		if (server is null)
-		{
-			return Result.Failure(Error.EntityNotFound(nameof(Server), serverId.ToString()));
-		}
-		server.Status = ServerStatus.Stopped;
-		_serversRepository.Update(server);
-		await _unitOfWork.SaveChangesAsync();
-		return Result.Success();
-	}
 }

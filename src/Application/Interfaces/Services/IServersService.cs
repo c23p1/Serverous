@@ -8,6 +8,4 @@ public interface IServersService
 {
 	Task<GenericResult<List<Server>>> GetAvailableAsync(ServerFilters filters);
 	Task<GenericResult<AddServerResponse>> Add(AddServerRequest addServerRequest);
-	Task<Result> StartServerById(Guid serverId);
-	Task<Result> StopServerById(Guid serverId);
 }
