@@ -1,14 +1,16 @@
 using Application.Interfaces;
+using Application.Interfaces.Identity;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Services;
+using Infrastructure.Identity;
 using Infrastructure.Persistence.Data;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.DependencyInjection;
+namespace Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -19,13 +21,6 @@ public static class ServiceCollectionExtensions
 
 		services.AddDbContext<ApplicationDbContext>(dbContextOptions =>
 			dbContextOptions.UseNpgsql(connectionString));
-
-		var serviceProvider = services.BuildServiceProvider();
-		using (var scope = serviceProvider.CreateScope())
-		{
-			var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-			dbContext.Database.EnsureCreated();
-		}
 
 		services.AddScoped<IServersRepository, ServersRepository>();
 		services.AddScoped<IUnitOfWork, UnitOfWork>();

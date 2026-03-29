@@ -1,11 +1,11 @@
-using Infrastructure.DependencyInjection;
+using Infrastructure.Extensions;
 using Scalar.AspNetCore;
 
 namespace API;
 
 public class Program
 {
-	public static void Main(string[] args)
+	public static async Task Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +18,8 @@ public class Program
 		builder.Services.AddControllers();
 
 		var app = builder.Build();
+
+		await app.Services.InitializeDatabaseAsync();
 
 		if (app.Environment.IsDevelopment())
 		{
