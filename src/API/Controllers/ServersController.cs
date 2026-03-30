@@ -23,7 +23,7 @@ public class ServersController : ControllerBase
 		return result.ToActionResult();
 	}
 
-	[HttpGet]
+	[HttpGet("available")]
 	public async Task<ActionResult<List<ServerDetailResponse>>> GetAvailableAsync([FromQuery] ServerFilters filters) =>
 		(await _serversService.GetAvailableAsync(filters)).ToActionResult();
 }
