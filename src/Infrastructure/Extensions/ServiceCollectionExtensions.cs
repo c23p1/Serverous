@@ -1,7 +1,9 @@
 using Application.Interfaces;
 using Application.Interfaces.Identity;
+using Application.Interfaces.Jobs;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
+using Infrastructure.Jobs;
 using Application.Services;
 using Infrastructure.Identity;
 using Infrastructure.Persistence.Data;
@@ -23,9 +25,16 @@ public static class ServiceCollectionExtensions
 			dbContextOptions.UseNpgsql(connectionString));
 
 		services.AddScoped<IServersRepository, ServersRepository>();
+		services.AddScoped<ISessionsRepository, SessionsRepository>();
 		services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 		services.AddTransient<IServersService, ServersService>();
+		services.AddTransient<ISessionsService, SessionsService>();
+		services.AddTransient<ISessionStateService, SessionStateService>();
+
+		services.AddTransient<ISessionJobScheduler, HangfireSessionJobScheduler>();
+
+		services.AddScoped<ICurrentUser, CurrentUser>();
 
 		return services;
 	}

@@ -1,4 +1,8 @@
+using System.Text.Json.Serialization;
+using API.Extensions;
+using API.Handlers;
 using Infrastructure.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Scalar.AspNetCore;
 
 namespace API;
@@ -12,10 +16,17 @@ public class Program
 		builder.Configuration.AddEnvironmentVariables();
 
 		builder.Services.AddInfrastructure(builder.Configuration);
+		builder.Services.AddHangfireServices(builder.Configuration);
+
+		builder.Services.AddAuthentication(UserIdHeaderAuthenticationHandler.SchemeName)
+			.AddScheme<AuthenticationSchemeOptions, UserIdHeaderAuthenticationHandler>(UserIdHeaderAuthenticationHandler.SchemeName, null);
+
+		builder.Services.AddAuthorization();
 
 		builder.Services.AddOpenApi();
 
-		builder.Services.AddControllers();
+		builder.Services.AddControllers()
+			.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 		var app = builder.Build();
 
@@ -28,6 +39,10 @@ public class Program
 		}
 
 		app.UseHttpsRedirection();
+
+		app.UseAuthentication();
+
+		app.UseAuthorization();
 
 		app.MapControllers();
 
