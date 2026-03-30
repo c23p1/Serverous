@@ -5,6 +5,7 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -15,12 +16,14 @@ public class SessionStateService : ISessionStateService
 	private readonly ISessionsRepository _sessionsRepository;
 	private readonly ISessionJobScheduler _sessionJobScheduler;
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly ILogger<SessionStateService> _logger;
 
-	public SessionStateService(ISessionsRepository sessionsRepository, ISessionJobScheduler sessionJobScheduler, IUnitOfWork unitOfWork)
+	public SessionStateService(ISessionsRepository sessionsRepository, ISessionJobScheduler sessionJobScheduler, IUnitOfWork unitOfWork, ILogger<SessionStateService> logger)
 	{
 		_sessionsRepository = sessionsRepository;
 		_sessionJobScheduler = sessionJobScheduler;
 		_unitOfWork = unitOfWork;
+		_logger = logger;
 	}
 
 	public async Task<Result> Activate(Guid sessionId)
@@ -49,6 +52,7 @@ public class SessionStateService : ISessionStateService
 
 		await _unitOfWork.SaveChangesAsync();
 		_sessionJobScheduler.ScheduleExpiration(session.Id, SessionDuration);
+		_logger.LogInformation("Сессия {SessionId} активирована, сервер {ServerId} запущен", session.Id, session.ServerId);
 		return Result.Success();
 	}
 
@@ -70,6 +74,7 @@ public class SessionStateService : ISessionStateService
 		session.Server!.Status = ServerStatus.Stopped;
 
 		await _unitOfWork.SaveChangesAsync();
+		_logger.LogInformation("Сессия {SessionId} завершена по таймеру, сервер {ServerId} остановлен", session.Id, session.ServerId);
 		return Result.Success();
 	}
 
@@ -84,6 +89,7 @@ public class SessionStateService : ISessionStateService
 		var session = sessionResult.Value;
 		if (session.UserId != userId)
 		{
+			_logger.LogWarning("Невозможно освободить сервер: сессия {SessionId} не принадлежит текущему пользователю", sessionId);
 			return Result.Failure(Error.Unauthorized("Невозможно освободить сервер: сессия не принадлежит текущему пользователю"));
 		}
 		if (!session.IsActive)
@@ -101,6 +107,7 @@ public class SessionStateService : ISessionStateService
 		}
 
 		await _unitOfWork.SaveChangesAsync();
+		_logger.LogInformation("Сессия {SessionId} остановлена пользователем {UserId}", session.Id, userId);
 		return Result.Success();
 	}
 

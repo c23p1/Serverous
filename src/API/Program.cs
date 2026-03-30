@@ -4,6 +4,7 @@ using API.Handlers;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Scalar.AspNetCore;
+using Serilog;
 
 namespace API;
 
@@ -14,6 +15,9 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		builder.Configuration.AddEnvironmentVariables();
+
+		builder.Host.UseSerilog((context, loggerConfiguration) =>
+			loggerConfiguration.ReadFrom.Configuration(context.Configuration));
 
 		builder.Services.AddInfrastructure(builder.Configuration);
 		builder.Services.AddHangfireServices(builder.Configuration);
@@ -39,6 +43,7 @@ public class Program
 		}
 
 		app.UseHttpsRedirection();
+		app.UseSerilogRequestLogging();
 
 		app.UseAuthentication();
 

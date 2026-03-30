@@ -25,6 +25,7 @@ public sealed class UserIdHeaderAuthenticationHandler : AuthenticationHandler<Au
 		}
 		if (!Guid.TryParse(userIdHeader, out var userId))
 		{
+			Logger.LogWarning("Не удалось выполнить аутентификацию: Неверный формат идентификатора пользователя ({UserId})", userIdHeader.ToString());
 			return Task.FromResult(AuthenticateResult.Fail("Неверный формат идентификатора пользователя"));
 		}
 
@@ -32,6 +33,7 @@ public sealed class UserIdHeaderAuthenticationHandler : AuthenticationHandler<Au
 		var identity = new ClaimsIdentity(claims, SchemeName);
 		var principal = new ClaimsPrincipal(identity);
 		_currentUser.Initialize(principal);
+		Logger.LogInformation("Аутентификация успешно выполнена для пользователя {UserId}", userId);
 
 		var ticket = new AuthenticationTicket(principal, SchemeName);
 		return Task.FromResult(AuthenticateResult.Success(ticket));

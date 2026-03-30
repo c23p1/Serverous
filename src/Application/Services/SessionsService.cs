@@ -7,6 +7,7 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -21,6 +22,7 @@ public class SessionsService : ISessionsService
 	private readonly ISessionStateService _sessionStateService;
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly ICurrentUser _currentUser;
+	private readonly ILogger<SessionsService> _logger;
 
 	public SessionsService
 	(
@@ -29,7 +31,8 @@ public class SessionsService : ISessionsService
 		ISessionJobScheduler sessionJobScheduler,
 		ISessionStateService sessionStateService,
 		IUnitOfWork unitOfWork,
-		ICurrentUser currentUser
+		ICurrentUser currentUser,
+		ILogger<SessionsService> logger
 	)
 	{
 		_sessionsRepository = sessionsRepository;
@@ -38,6 +41,7 @@ public class SessionsService : ISessionsService
 		_sessionStateService = sessionStateService;
 		_unitOfWork = unitOfWork;
 		_currentUser = currentUser;
+		_logger = logger;
 	}
 
 	public async Task<GenericResult<StartSessionResponse>> Start(Guid serverId)
@@ -45,10 +49,12 @@ public class SessionsService : ISessionsService
 		var server = await _serversRepository.GetByIdAsync(serverId);
 		if (server is null)
 		{
+			_logger.LogWarning("Не удалось запустить сессию: сервер {ServerId} не найден", serverId);
 			return GenericResult<StartSessionResponse>.Failure(Error.EntityNotFound(nameof(Server), serverId.ToString()));
 		}
 		if (await _sessionsRepository.HasActiveSessionForServerAsync(serverId))
 		{
+			_logger.LogWarning("Не удалось запустить сессию: у сервера {ServerId} уже есть активная сессия", serverId);
 			return GenericResult<StartSessionResponse>.Failure(Error.InvalidOperation("У сервера уже есть активная сессия"));
 		}
 
@@ -83,6 +89,8 @@ public class SessionsService : ISessionsService
 		{
 			_sessionJobScheduler.ScheduleExpiration(session.Id, SessionDuration);
 		}
+
+		_logger.LogInformation("Сессия {SessionId} создана для сервера {ServerId} пользователем {UserId}", session.Id, serverId, _currentUser.UserId);
 
 		var startSessionResponse = new StartSessionResponse { Id = session.Id };
 		return GenericResult<StartSessionResponse>.Success(startSessionResponse);
