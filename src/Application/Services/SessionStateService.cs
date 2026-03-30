@@ -71,7 +71,7 @@ public class SessionStateService : ISessionStateService
 		}
 		session.IsActive = false;
 		session.Status = SessionStatus.Expired;
-		session.Server!.Status = ServerStatus.Stopped;
+		session.Server?.Status = ServerStatus.Stopped;
 
 		await _unitOfWork.SaveChangesAsync();
 		_logger.LogInformation("Сессия {SessionId} завершена по таймеру, сервер {ServerId} остановлен", session.Id, session.ServerId);
