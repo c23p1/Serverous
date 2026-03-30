@@ -1,3 +1,4 @@
+using OperatingSystem = Domain.Enums.OperatingSystem;
 using Domain.Entities;
 using Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,31 @@ public static class ServiceProviderExtensions
 			{
 				Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
 				Name = "Сергей"
+			}
+		);
+
+		dbContext.Set<Server>().AddRange
+		(
+			new Server
+			{
+				OperatingSystem = OperatingSystem.Ubuntu,
+				RamGiB = 4,
+				StorageGiB = 50,
+				CpuCoreCount = 4
+			},
+			new Server
+			{
+				OperatingSystem = OperatingSystem.Debian,
+				RamGiB = 8,
+				StorageGiB = 100,
+				CpuCoreCount = 4
+			},
+			new Server
+			{
+				OperatingSystem = OperatingSystem.ArchLinux,
+				RamGiB = 16,
+				StorageGiB = 1000,
+				CpuCoreCount = 12
 			}
 		);
 
