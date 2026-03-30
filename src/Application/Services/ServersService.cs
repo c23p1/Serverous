@@ -19,10 +19,19 @@ public class ServersService : IServersService
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<GenericResult<List<Server>>> GetAvailableAsync(ServerFilters filters) =>
-		GenericResult<List<Server>>.Success(await _serversRepository.GetAvailableAsync(filters));
+	public async Task<GenericResult<List<ServerDetailResponse>>> GetAvailableAsync(ServerFilters filters) =>
+		GenericResult<List<ServerDetailResponse>>.Success((await _serversRepository.GetAvailableAsync(filters))
+			.ConvertAll(s =>
+				new ServerDetailResponse
+				{
+					Id = s.Id,
+					OperatingSystem = s.OperatingSystem,
+					RamGiB = s.RamGiB,
+					StorageGiB = s.StorageGiB,
+					CpuCoreCount = s.CpuCoreCount
+				}));
 
-	public async Task<GenericResult<AddServerResponse>> Add(AddServerRequest addServerRequest)
+	public async Task<GenericResult<ServerDetailResponse>> Add(AddServerRequest addServerRequest)
 	{
 		var server = new Server
 		{
@@ -35,7 +44,7 @@ public class ServersService : IServersService
 		_serversRepository.Add(server);
 		await _unitOfWork.SaveChangesAsync();
 
-		var addServerResponse = new AddServerResponse
+		var serverDetailResponse = new ServerDetailResponse
 		{
 			Id = server.Id,
 			OperatingSystem = server.OperatingSystem,
@@ -43,6 +52,6 @@ public class ServersService : IServersService
 			StorageGiB = server.StorageGiB,
 			CpuCoreCount = server.CpuCoreCount
 		};
-		return GenericResult<AddServerResponse>.Success(addServerResponse);
+		return GenericResult<ServerDetailResponse>.Success(serverDetailResponse);
 	}
 }

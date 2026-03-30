@@ -1,7 +1,6 @@
 using API.Extensions;
 using Application.Contracts.Servers;
 using Application.Interfaces.Services;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -18,13 +17,13 @@ public class ServersController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<ActionResult<AddServerResponse>> AddServer(AddServerRequest addServerRequest)
+	public async Task<ActionResult<ServerDetailResponse>> AddServer(AddServerRequest addServerRequest)
 	{
 		var result = await _serversService.Add(addServerRequest);
 		return result.ToActionResult();
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<List<Server>>> GetAvailableAsync([FromQuery] ServerFilters filters) =>
+	public async Task<ActionResult<List<ServerDetailResponse>>> GetAvailableAsync([FromQuery] ServerFilters filters) =>
 		(await _serversService.GetAvailableAsync(filters)).ToActionResult();
 }
